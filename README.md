@@ -1,7 +1,5 @@
 # Clan Battle Manager
 
------
-
 ## Overview (Japanese Only)
 
 Cygames社からリリースされているスマホ向けRPG「プリンセスコネクト Re:Dive」のクランバトルの諸々の管理を補助する Discord Bot です。
