@@ -31,6 +31,8 @@ def configure_bot(content):
     elif content[1] == 'get':
         get_config(content)
         return
+    else:
+        return
 
 def init_config():
     pass
@@ -39,9 +41,47 @@ def show_config():
     pass
 
 def set_config(content):
-    pass
+    if content[2] == 'spreadsheets':
+        set_spreadsheets(content[3])
+        return
+    elif content[2] == 'monsters':
+        set_monsters(content[3])
+        return
+    elif content[2] == 'members':
+        set_members(content[3])
+        return
+    else:
+        return
 
 def get_config(content):
+    if content[2] == 'spreadsheets':
+        get_spreadsheets()
+        return
+    elif content[2] == 'monsters':
+        get_monsters()
+        return
+    elif content[2] == 'members':
+        get_members()
+        return
+    else:
+        return
+
+def set_spreadsheets(uri):
+    pass
+
+def set_monsters(monsters):
+    pass
+
+def set_members(members):
+    pass
+
+def get_spreadsheets():
+    pass
+
+def get_monsters():
+    pass
+
+def get_members():
     pass
 
 client.run('token')
