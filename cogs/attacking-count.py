@@ -1,51 +1,54 @@
+import configparser
 import discord
 import asyncio
 
 from datetime import datetime
 from discord.ext import commands, tasks
 
-BOT_USER_ID = 00000
-GUILD_ID = 00000
-CHANNEL_ID = 00000
-MEMBER_ROLE_ID = 00000
+SECTION = 'dev'
+#SECTION = 'prod'
+
+# ConfigParserから読み込むと絵文字にならなかったので要調査
 EMOJI_ONE = '\U0001F95A'
 EMOJI_TWO = '\U0001F423'
 EMOJI_THREE = '\U0001F425'
-EMBED_COLOR = 0xff69b4
-DATETIME_LIST = [
-    '2019-12-25 05:00',
-    '2019-12-26 05:00',
-    '2019-12-27 05:00',
-    '2019-12-28 05:00',
-    '2019-12-29 05:00',
-    '2019-12-30 05:00'
-]
 
 class AttackingCountCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.config_path = 'config.ini'
+        self.config = configparser.ConfigParser()
+        self.config.read(self.config_path, encoding='UTF-8')
+        self.config_section = self.config[SECTION]
+        self.bot_user_id = self.config_section.getint('BotUserID')
+        self.guild_id = self.config_section.getint('GuildID')
+        self.channel_id = self.config_section.getint('ChannelID')
+        self.member_role_id = self.config_section.getint('MemberRoleID')
+        self.embed_color = eval(self.config_section.get('EmbedColor'))
+        self.datetime_list = eval(self.config_section.get('DatetimeList'))
         self.check_dateline.start()
 
     def cog_unload(self):
         self.check_dateline.cancel()
 
     async def print_daily_attacking_count(self, idxnum, now, utcnow):
-        guild = self.bot.get_guild(GUILD_ID)
-        channel = self.bot.get_channel(CHANNEL_ID)
+        guild = self.bot.get_guild(self.guild_id)
+        channel = self.bot.get_channel(self.channel_id)
         all_members = self.bot.get_all_members()
-        member_role = guild.get_role(MEMBER_ROLE_ID)
+        member_role = guild.get_role(self.member_role_id)
         target_members = [member.name for member in all_members if member_role in member.roles]
         today = now.strftime('%m/%d')
         title = today
-        if idxnum == len(DATETIME_LIST) - 1:
+        if idxnum == len(self.datetime_list) - 1:
             title += " (最終日)"
         else:
             title += f" ({idxnum + 1}日目)"
-        embed = discord.Embed(title = title, color = EMBED_COLOR, timestamp = utcnow)
-        embed.add_field(name = '3凸', value = 'Nobody', inline = False)
-        embed.add_field(name = '2凸', value = 'Nobody', inline = False)
-        embed.add_field(name = '1凸', value = 'Nobody', inline = False)
-        embed.add_field(name = '0凸', value = '\n'.join(target_members), inline = False)
+        embed = discord.Embed(title = title, color = self.embed_color, timestamp = utcnow)
+        # スマホ版Discordだと、フィールドの区切りが分かりづらいため、セパレーター文字列を入れている
+        embed.add_field(name = f'-----\n3凸{EMOJI_THREE}', value = 'Nobody', inline = False)
+        embed.add_field(name = f'-----\n2凸{EMOJI_TWO}', value = 'Nobody', inline = False)
+        embed.add_field(name = f'-----\n1凸{EMOJI_ONE}', value = 'Nobody', inline = False)
+        embed.add_field(name = '-----\n0凸', value = '\n'.join(target_members), inline = False)
         embed.set_footer(text = f"Latest Edit: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}, User: Bot")
         msg_obj = await channel.send(embed = embed)
         await msg_obj.add_reaction(EMOJI_ONE)
@@ -80,17 +83,17 @@ class AttackingCountCog(commands.Cog):
 
     @commands.Cog.listener()
     async def on_reaction_add(self, reaction, user):
-        if reaction.message.channel.id != CHANNEL_ID:
+        if reaction.message.channel.id != self.channel_id:
             return
-        if user.id == BOT_USER_ID:
+        if user.id == self.bot_user_id:
             return
         embed = discord.Embed()
         if reaction.emoji == EMOJI_ONE:
-            embed = await self.move_username_between_field(reaction, user, 3, '0凸', 2, '1凸')
+            embed = await self.move_username_between_field(reaction, user, 3, '-----\n0凸', 2, f'-----\n1凸{EMOJI_ONE}')
         elif reaction.emoji == EMOJI_TWO:
-            embed = await self.move_username_between_field(reaction, user, 2, '1凸', 1, '2凸')
+            embed = await self.move_username_between_field(reaction, user, 2, f'-----\n1凸{EMOJI_ONE}', 1, f'-----\n2凸{EMOJI_TWO}')
         elif reaction.emoji == EMOJI_THREE:
-            embed = await self.move_username_between_field(reaction, user, 1, '2凸', 0, '3凸')
+            embed = await self.move_username_between_field(reaction, user, 1, f'-----\n2凸{EMOJI_TWO}', 0, f'-----\n3凸{EMOJI_THREE}')
         else:
             return
         print(f'{user.name}: {reaction.emoji} - add')
@@ -98,17 +101,17 @@ class AttackingCountCog(commands.Cog):
 
     @commands.Cog.listener()
     async def on_reaction_remove(self, reaction, user):
-        if reaction.message.channel.id != CHANNEL_ID:
+        if reaction.message.channel.id != self.channel_id:
             return
-        if user.id == BOT_USER_ID:
+        if user.id == self.bot_user_id:
             return
         embed = discord.Embed()
         if reaction.emoji == EMOJI_THREE:
-            embed = await self.move_username_between_field(reaction, user, 0, '3凸', 1, '2凸')
+            embed = await self.move_username_between_field(reaction, user, 0, f'-----\n3凸{EMOJI_THREE}', 1, f'-----\n2凸{EMOJI_TWO}')
         elif reaction.emoji == EMOJI_TWO:
-            embed = await self.move_username_between_field(reaction, user, 1, '2凸', 2, '1凸')
+            embed = await self.move_username_between_field(reaction, user, 1, f'-----\n2凸{EMOJI_TWO}', 2, f'-----\n1凸{EMOJI_ONE}')
         elif reaction.emoji == EMOJI_ONE:
-            embed = await self.move_username_between_field(reaction, user, 2, '1凸', 3, '0凸')
+            embed = await self.move_username_between_field(reaction, user, 2, f'-----\n1凸{EMOJI_ONE}', 3, '-----\n0凸')
         else:
             return
         print(f'{user.name}: {reaction.emoji} - remove')
@@ -119,8 +122,8 @@ class AttackingCountCog(commands.Cog):
         now = datetime.now()
         utc_now = datetime.utcnow()
         now_strf = now.strftime('%Y-%m-%d %H:%M')
-        if now_strf in DATETIME_LIST:
-            i = DATETIME_LIST.index(now_strf)
+        if now_strf in self.datetime_list:
+            i = self.datetime_list.index(now_strf)
             print(now_strf)
             await self.print_daily_attacking_count(i, now, utc_now)
             await asyncio.sleep(30)
