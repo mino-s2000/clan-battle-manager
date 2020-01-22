@@ -56,3 +56,6 @@ docs/_build/
 
 # PyBuilder
 target/
+
+# API Key File
+DiscordBotPrj-2b6ab8dd468f.json
