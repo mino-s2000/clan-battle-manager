@@ -4,7 +4,8 @@ from discord.ext import tasks, commands
 
 DISCORD_TOKEN = ''
 INITIAL_EXTENSIONS = [
-    'cogs.attacking-count'
+    'cogs.attacking-count',
+    'cogs.attacking-appointment'
 ]
 
 class MainBot(commands.Bot):

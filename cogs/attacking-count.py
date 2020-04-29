@@ -22,9 +22,9 @@ class AttackingCountCog(commands.Cog):
         self.config_section = self.config[SECTION]
         self.bot_user_id = self.config_section.getint('BotUserID')
         self.guild_id = self.config_section.getint('GuildID')
-        self.channel_id = self.config_section.getint('ChannelID')
+        self.channel_id = self.config_section.getint('CountChannelID')
         self.member_role_id = self.config_section.getint('MemberRoleID')
-        self.embed_color = eval(self.config_section.get('EmbedColor'))
+        self.embed_color = eval(self.config_section.get('CountEmbedColor'))
         self.datetime_list = eval(self.config_section.get('DatetimeList'))
         self.check_dateline.start()
 
