@@ -43,7 +43,8 @@ class AttackingCountCog(commands.Cog):
             title += " (最終日)"
         else:
             title += f" ({idxnum + 1}日目)"
-        embed = discord.Embed(title = title, color = self.embed_color, timestamp = utcnow)
+        description = f'凸状況をリアルタイムで把握したいので、1凸するごとにリアクションをしてください。\n1凸目が終わったら{EMOJI_ONE}を、2凸目が終わったら{EMOJI_TWO}を、3凸目が終わったら{EMOJI_THREE}を押してください。'
+        embed = discord.Embed(title = title, description = description, color = self.embed_color, timestamp = utcnow)
         # スマホ版Discordだと、フィールドの区切りが分かりづらいため、セパレーター文字列を入れている
         embed.add_field(name = f'-----\n3凸{EMOJI_THREE}', value = 'Nobody', inline = False)
         embed.add_field(name = f'-----\n2凸{EMOJI_TWO}', value = 'Nobody', inline = False)
