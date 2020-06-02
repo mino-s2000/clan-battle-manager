@@ -38,6 +38,9 @@ class AttackingAppointmentCog(commands.Cog):
         now_strf = now.strftime('%Y-%m-%d %H:%M')
         if now_strf == self.datetime_list[0]:
             await self.print_appointment(1, utc_now)
+            await asyncio.sleep(30)
+            await self.print_appointment(2, utc_now)
+            await asyncio.sleep(30)
 
     @check_dateline.before_loop
     async def before_check_dateline(self):
@@ -48,22 +51,27 @@ class AttackingAppointmentCog(commands.Cog):
         guild = self.bot.get_guild(self.guild_id)
         channel = self.bot.get_channel(self.channel_id)
         level = 0
+        hp = []
         if count <= 3:
             level = 1
+            hp = [600, 800, 1000, 1200, 1500]
         elif count > 3 and count <= 10:
             level = 2
+            hp = [600, 800, 1000, 1200, 1500]
         elif count > 10 and count <= 34:
             level = 3
+            hp = [700, 900, 1300, 1500, 2000]
         else:
             level = 4
+            hp = [1500, 1600, 1800, 1900, 2000]
         title = f'{count}周目 ({level}段階目)'
         description = f'{EMOJI_APPO_ONE} : 1凸目\n{EMOJI_APPO_TWO} : 2凸目\n{EMOJI_APPO_THREE} : 3凸目\n{EMOJI_APPO_RETAIN} : 持ち越し'
         embed = discord.Embed(title = title, description = description, color = self.embed_color, timestamp = utcnow)
-        embed.add_field(name = f'- - - - -\n{self.boss_list[0]}', value = 'Nobody', inline = False)
-        embed.add_field(name = f'- - - - -\n{self.boss_list[1]}', value = 'Nobody', inline = False)
-        embed.add_field(name = f'- - - - -\n{self.boss_list[2]}', value = 'Nobody', inline = False)
-        embed.add_field(name = f'- - - - -\n{self.boss_list[3]}', value = 'Nobody', inline = False)
-        embed.add_field(name = f'- - - - -\n{self.boss_list[4]}', value = 'Nobody', inline = False)
+        embed.add_field(name = f'- - - - -\n{self.boss_list[0]} {hp[0]}', value = 'Nobody', inline = False)
+        embed.add_field(name = f'- - - - -\n{self.boss_list[1]} {hp[1]}', value = 'Nobody', inline = False)
+        embed.add_field(name = f'- - - - -\n{self.boss_list[2]} {hp[2]}', value = 'Nobody', inline = False)
+        embed.add_field(name = f'- - - - -\n{self.boss_list[3]} {hp[3]}', value = 'Nobody', inline = False)
+        embed.add_field(name = f'- - - - -\n{self.boss_list[4]} {hp[4]}', value = 'Nobody', inline = False)
         embed.set_footer(text = f"Latest Edit: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}, User: Bot")
         msg_obj = await channel.send(embed = embed)
         for boss in self.boss_list:
