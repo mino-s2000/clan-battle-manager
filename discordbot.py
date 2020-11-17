@@ -8,8 +8,8 @@ INITIAL_EXTENSIONS = [
 ]
 
 class MainBot(commands.Bot):
-    def __init__(self, command_prefix):
-        super().__init__(command_prefix)
+    def __init__(self, command_prefix, help_command, intents):
+        super().__init__(command_prefix, intents=intents)
         for cog in INITIAL_EXTENSIONS:
             self.load_extension(cog)
 
@@ -20,5 +20,5 @@ class MainBot(commands.Bot):
         print('-----')
 
 if __name__ == '__main__':
-    bot = MainBot(command_prefix = '/')
+    bot = MainBot(command_prefix='/', help_command=None, intents=discord.Intents.all())
     bot.run(DISCORD_TOKEN)

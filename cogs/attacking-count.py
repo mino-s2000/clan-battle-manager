@@ -134,4 +134,4 @@ class AttackingCountCog(commands.Cog):
         await self.bot.wait_until_ready()
 
 def setup(bot):
-    bot.add_cog(AttackingCountCog(bot))
+    return bot.add_cog(AttackingCountCog(bot))
